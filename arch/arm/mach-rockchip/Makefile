@@ -39,6 +39,7 @@ obj-y += boot_mode.o
 obj-y += boot_rkimg.o
 obj-y += board.o
 obj-y += iomem.o
+obj-$(CONFIG_OF_LIBFDT_OVERLAY) += overlay_loader.o
 obj-y += memblk.o
 obj-$(CONFIG_ROCKCHIP_HOTKEY) += hotkey.o
 else

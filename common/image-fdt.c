@@ -19,6 +19,10 @@
 #include <asm/io.h>
 #include <sysmem.h>
 
+#if defined(CONFIG_OF_LIBFDT_OVERLAY) && defined(CONFIG_ARCH_ROCKCHIP)
+#include <asm/arch/overlay_loader.h>
+#endif
+
 #ifndef CONFIG_SYS_FDT_PAD
 #define CONFIG_SYS_FDT_PAD 0x3000
 #endif
@@ -640,6 +644,16 @@ int image_setup_libfdt(bootm_headers_t *images, void *blob,
 
 	/* Update ethernet nodes */
 	fdt_fixup_ethernet(blob);
+
+#if defined(CONFIG_OF_LIBFDT_OVERLAY) && defined(CONFIG_ARCH_ROCKCHIP)
+	/* Apply dynamic device tree overlays from rootfs /boot/ubootEnv.txt
+	 * This must be done here (on the final FDT) rather than in
+	 * rockchip_read_dtb_file(), because FIT boot reloads a fresh DTB
+	 * from the FIT image, overwriting any earlier overlay modifications.
+	 */
+	rockchip_load_dtbo_overlays(blob);
+#endif
+
 	if (IMAGE_OF_BOARD_SETUP) {
 		fdt_ret = ft_board_setup(blob, gd->bd);
 		if (fdt_ret) {
